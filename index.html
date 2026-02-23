@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Countdown</title>
+
+<!-- Digital font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    background: #000;
+    overflow: hidden; /* embed safe */
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .digitWrapper {
+    display: flex;
+    flex-direction: column;
+
+  }
+
+  .countdown {
+    font-family: 'Cadillac Gothic', sans-serif;
+    font-weight: 700;
+   /* color: #00ffcc;*/
+    text-align: center;
+    line-height: 1.1;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: row;
+
+    /* Auto scaling */
+    font-size: clamp(28px, 10vw, 140px);
+
+    /* Glow effect */
+    text-shadow:
+      0 0 5px #00ffcc,
+      0 0 10px #00ffcc,
+      0 0 20px #00ffcc,
+      0 0 40px rgba(0,255,204,0.7);
+  }
+
+  /* Tick animation */
+  .tick {
+    animation: pop 0.3s ease;
+  }
+
+  @keyframes pop {
+    0%   { transform: scale(1); opacity: 0.7; }
+    50%  { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
+  /* Smaller iframe layout */
+  @media (max-height: 200px) {
+    .countdown {
+      font-size: clamp(18px, 8vw, 60px);
+    }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="countdown" id="countdown"></div>
+</div>
+
+<script>
+
+    // Čitanje ?date=2026-03-15T12:00:00
+const params = new URLSearchParams(window.location.search);
+const dateParam = params.get("date");
+const daysParam = params.get('days');
+
+// fallback ako nema parametra
+const finalDate = dateParam 
+  ? new Date(dateParam).getTime()
+  //: new Date("2026-03-15T12:00:00").getTime();
+  : new Date("2026-02-25T12:00:00").getTime();
+
+// 7 dana u milisekundama
+const sevenDays = (daysParam ? daysParam : 7) * 24 * 60 * 60 * 1000;
+
+// Countdown počinje 7 dana pre finalnog datuma
+const countdownStart = finalDate - sevenDays;
+  const el = document.getElementById("countdown");
+
+function update() {
+  const now = new Date().getTime();
+
+  let diff;
+
+  if (now < countdownStart) {
+    // još nije počeo countdown
+    diff = sevenDays;
+  } else if (now >= countdownStart && now <= finalDate) {
+    diff = finalDate - now;
+  } else {
+    diff = 0;
+  }
+
+  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const m = Math.floor((diff / (1000 * 60)) % 60);
+  const s = Math.floor((diff / 1000) % 60);
+
+  el.classList.remove("tick");
+  void el.offsetWidth;
+  el.classList.add("tick");
+
+  el.innerHTML = `
+    <div class='digitWrapper'>
+        <span>
+            ${String(d).padStart(2, "0")}:
+        </span>    
+        <span>
+           DANA
+        </span>    
+    </div> `+
+    `${String(h).padStart(2, "0")}:` +
+    `${String(m).padStart(2, "0")}:` +
+    `${String(s).padStart(2, "0")}`;
+}
+
+update();
+setInterval(update, 1000);
+</script>
+
+</body>
+</html>
