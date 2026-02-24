@@ -171,6 +171,7 @@
     newUrl.searchParams.set('title', title);
     newUrl.searchParams.set('date', targetDate.toISOString());
     newUrl.searchParams.set('theme', theme);
+    newUrl.searchParams.set('embed', true);
     window.history.replaceState({}, '', newUrl);
 
     // Generate iframe code
